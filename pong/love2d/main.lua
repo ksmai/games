@@ -115,8 +115,7 @@ function love.update(dt)
     end
 
     if ball:collides(playerPaddle) or ball:collides(computerPaddle) then
-      local sign = math.random(1, 2) == 1 and 1 or -1
-      ball.dx = sign * math.random(1, 150)
+      ball.dx = math.random(-150, 150) * ball.dy / 200
       ball.dy = -ball.dy * 1.1
       sounds.hit:play()
 
