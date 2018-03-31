@@ -62,6 +62,13 @@ function love.load()
   playerServing = true
 
   gameState = 'start'
+
+  sounds = {
+    lose = love.audio.newSource('sounds/lose.wav', 'static'),
+    win = love.audio.newSource('sounds/win.wav', 'static'),
+    score = love.audio.newSource('sounds/score.wav', 'static'),
+    hit = love.audio.newSource('sounds/paddle_hit.wav', 'static')
+  }
 end
 
 function love.keypressed(key)
@@ -86,17 +93,21 @@ end
 function love.update(dt)
   if gameState == 'play' then
     if ball.y + ball.height < 0 then
+      sounds.score:play()
       playerScore = playerScore + 1
       playerServing = false
       if playerScore >= WIN_SCORE then
         gameState = 'end'
+        sounds.win:play()
       else
         gameState = 'serve'
       end
     elseif ball.y > GAME_HEIGHT then
+      sounds.score:play()
       computerScore = computerScore + 1
       playerServing = true
       if computerScore >= WIN_SCORE then
+        sounds.lose:play()
         gameState = 'end'
       else
         gameState = 'serve'
@@ -107,6 +118,7 @@ function love.update(dt)
       local sign = math.random(1, 2) == 1 and 1 or -1
       ball.dx = sign * math.random(1, 150)
       ball.dy = -ball.dy * 1.1
+      sounds.hit:play()
 
       if ball:collides(playerPaddle) then
         ball.y = playerPaddle.y - ball.height
