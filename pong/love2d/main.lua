@@ -107,6 +107,12 @@ function love.update(dt)
       local sign = math.random(1, 2) == 1 and 1 or -1
       ball.dx = sign * math.random(1, 150)
       ball.dy = -ball.dy * 1.1
+
+      if ball:collides(playerPaddle) then
+        ball.y = playerPaddle.y - ball.height
+      elseif ball:collides(computerPaddle) then
+        ball.y = computerPaddle.y + computerPaddle.height
+      end
     end
 
     if ball.x < 0 then
