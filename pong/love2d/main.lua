@@ -120,10 +120,24 @@ function love.update(dt)
       sounds.hit:play()
 
       if ball:collides(playerPaddle) then
-        ball.y = playerPaddle.y - ball.height
+        ball.y = playerPaddle.y - ball.height - 1
       elseif ball:collides(computerPaddle) then
-        ball.y = computerPaddle.y + computerPaddle.height
+        ball.y = computerPaddle.y + computerPaddle.height + 1
       end
+    elseif
+      ball.y + ball.height < playerPaddle.y and
+      ball.y + ball.dy * dt > playerPaddle.y + playerPaddle.height
+    then
+      ball.x = ball.x + (playerPaddle.y - ball.y) * ball.dx / ball.dy
+      ball.y = playerPaddle.y
+    elseif
+      ball.y > computerPaddle.y + computerPaddle.height and
+      ball.y + ball.dy * dt + ball.height < computerPaddle.y
+    then
+      ball.x = ball.x + (computerPaddle.y - ball.y - ball.dy * dt) * ball.dx / (-ball.dy)
+      ball.y = computerPaddle.y
+    else
+      ball:update(dt)
     end
 
     if ball.x < 0 then
@@ -133,8 +147,6 @@ function love.update(dt)
       ball.x = GAME_WIDTH - ball.width
       ball.dx = -ball.dx
     end
-
-    ball:update(dt)
   end
 
   if love.keyboard.isDown('left') then
