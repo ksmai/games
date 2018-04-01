@@ -99,6 +99,12 @@ function PlayState:update(dt)
             score = self.score
         })
     end
+
+    if love.keyboard.wasPressed('p') then
+      gStateMachine:change('pause', {
+        previousState = self
+      })
+    end
 end
 
 function PlayState:render()
@@ -108,6 +114,9 @@ function PlayState:render()
 
     love.graphics.setFont(flappyFont)
     love.graphics.print('Score: ' .. tostring(self.score), 8, 8)
+
+    love.graphics.setFont(smallFont)
+    love.graphics.print('Press \'p\' to pause', 8, VIRTUAL_HEIGHT - 24)
 
     self.bird:render()
 end

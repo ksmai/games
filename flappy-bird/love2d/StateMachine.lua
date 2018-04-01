@@ -52,6 +52,13 @@ function StateMachine:change(stateName, enterParams)
 	self.current:enter(enterParams)
 end
 
+function StateMachine:transition(state)
+  assert(state)
+  self.current:exit()
+  self.current = state
+  self.current:enter()
+end
+
 function StateMachine:update(dt)
 	self.current:update(dt)
 end
