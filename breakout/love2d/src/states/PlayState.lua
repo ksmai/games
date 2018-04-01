@@ -28,8 +28,14 @@ function PlayState:enter(params)
     self.highScores = params.highScores
     self.balls = { params.ball }
     self.level = params.level
+    self.hasLocks = false
+    for k, brick in pairs(self.bricks) do
+      if brick:locked() then
+        self.hasLocks = true
+      end
+    end
 
-    self.recoverPoints = 500
+    self.recoverPoints = params.recoverPoints
     self.powerupCountdown = 1
 
     -- give ball random starting velocity
@@ -62,7 +68,7 @@ function PlayState:update(dt)
     if math.random(30) == 1 then
       self.powerupCountdown = self.powerupCountdown - dt
       if self.powerupCountdown < 0 then
-        table.insert(self.powerups, Powerup())
+        table.insert(self.powerups, Powerup(self.hasLocks and 2 or 1))
         self.powerupCountdown = self.powerupCountdown + 1
       end
     end
@@ -71,14 +77,23 @@ function PlayState:update(dt)
       powerup:update(dt)
       if powerup:collides(self.paddle) then
         powerup:hit()
-        for i = 1, 2 do
-          local newBall = Ball()
-          newBall.skin = math.random(7)
-          newBall.x = self.paddle.x + self.paddle.width * (2 * i - 1) / 4 - newBall.width / 2
-          newBall.y = self.paddle.y - newBall.height
-          newBall.dx = math.random(50, 200) * (i == 1 and -1 or 1)
-          newBall.dy = math.random(-50, -60)
-          table.insert(self.balls, newBall)
+        if powerup.type == 2 then
+          for k, brick in pairs(self.bricks) do
+            if brick:locked() then
+              brick:unlock()
+            end
+          end
+          self.hasLocks = false
+        else
+          for i = 1, 2 do
+            local newBall = Ball()
+            newBall.skin = math.random(7)
+            newBall.x = self.paddle.x + self.paddle.width * (2 * i - 1) / 4 - newBall.width / 2
+            newBall.y = self.paddle.y - newBall.height
+            newBall.dx = math.random(50, 200) * (i == 1 and -1 or 1)
+            newBall.dy = math.random(-50, -60)
+            table.insert(self.balls, newBall)
+          end
         end
       end
       if not powerup.visible then
@@ -152,7 +167,9 @@ function PlayState:update(dt)
           if brick.inPlay and ball:collides(brick) then
 
               -- add to score
-              self.score = self.score + (brick.tier * 200 + brick.color * 25)
+              if not brick:locked() then
+                self.score = self.score + (brick.tier * 200 + brick.color * 25)
+              end
 
               -- trigger the brick's hit function, which removes it from play
               brick:hit()

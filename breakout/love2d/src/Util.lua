@@ -55,7 +55,12 @@ end
     we have to return a subset of GenerateQuads.
 ]]
 function GenerateQuadsBricks(atlas)
-    return table.slice(GenerateQuads(atlas, 32, 16), 1, 21)
+    quads = table.slice(GenerateQuads(atlas, 32, 16), 1, 21)
+    table.insert(
+      quads,
+      love.graphics.newQuad(160, 48, 32, 16, atlas:getDimensions())
+    )
+    return quads
 end
 
 --[[
@@ -124,4 +129,11 @@ function GenerateQuadsBalls(atlas)
     end
 
     return quads
+end
+
+function GenerateQuadsPowerups(atlas)
+  return {
+    love.graphics.newQuad(96, 192, 16, 16, gTextures.main:getDimensions()),
+    love.graphics.newQuad(144, 192, 16, 16, gTextures.main:getDimensions()),
+  }
 end

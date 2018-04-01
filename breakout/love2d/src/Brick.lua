@@ -80,11 +80,32 @@ function Brick:init(x, y)
     self.psystem:setAreaSpread('normal', 10, 10)
 end
 
+function Brick:locked()
+  return self.tier == 5
+end
+
+function Brick:unlock()
+  self.tier = 4
+end
+
+function Brick:lock()
+  self.tier = 5
+  self.color = 5
+end
+
 --[[
     Triggers a hit on the brick, taking it out of play if at 0 health or
     changing its color otherwise.
 ]]
 function Brick:hit()
+    -- sound on hit
+    gSounds['brick-hit-2']:stop()
+    gSounds['brick-hit-2']:play()
+
+    if self:locked() then
+      return
+    end
+
     -- set the particle system to interpolate between two colors; in this case, we give
     -- it our self.color but with varying alpha; brighter for higher tiers, fading to 0
     -- over the particle's lifetime (the second color)
@@ -99,10 +120,6 @@ function Brick:hit()
         0
     )
     self.psystem:emit(64)
-
-    -- sound on hit
-    gSounds['brick-hit-2']:stop()
-    gSounds['brick-hit-2']:play()
 
     -- if we're at a higher tier than the base, we need to go down a tier
     -- if we're already at the lowest color, else just go down a color

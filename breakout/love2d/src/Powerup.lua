@@ -1,6 +1,6 @@
 Powerup = Class{}
 
-function Powerup:init()
+function Powerup:init(type)
   self.width = 16
   self.height = 16
   self.padding = 16
@@ -8,6 +8,7 @@ function Powerup:init()
   self.x = math.random(self.padding, VIRTUAL_WIDTH - self.padding - self.width)
   self.dy = math.random(10, 30)
   self.visible = true
+  self.type = type
 end
 
 function Powerup:update(dt)
@@ -39,6 +40,6 @@ end
 
 function Powerup:render()
   if self.visible then
-    love.graphics.draw(gTextures.main, gFrames.powerups[1], self.x, self.y)
+    love.graphics.draw(gTextures.main, gFrames.powerups[self.type], self.x, self.y)
   end
 end
