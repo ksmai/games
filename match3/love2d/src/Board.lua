@@ -254,3 +254,11 @@ function Board:render()
         end
     end
 end
+
+function Board:update(dt)
+    for y = 1, #self.tiles do
+        for x = 1, #self.tiles[1] do
+            self.tiles[y][x]:update(dt)
+        end
+    end
+end
