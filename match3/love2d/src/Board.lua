@@ -143,7 +143,7 @@ function Board:calculateMatches()
             local match = {}
             
             -- go backwards from end of last row by matchNum
-            for y = 8, 8 - matchNum, -1 do
+            for y = 8, 8 - matchNum + 1, -1 do
                 table.insert(match, self.tiles[y][x])
             end
 
