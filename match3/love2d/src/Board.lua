@@ -84,12 +84,12 @@ function Board:calculateMatches()
                     table.insert(matches, match)
                 end
 
+                matchNum = 1
+
                 -- don't need to check last two if they won't be in a match
                 if x >= 7 then
                     break
                 end
-
-                matchNum = 1
             end
         end
 
