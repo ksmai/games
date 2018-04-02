@@ -188,7 +188,9 @@ function PlayState:calculateMatches()
 
         -- add score and time for each match
         for k, match in pairs(matches) do
-            self.score = self.score + #match * 50
+            for i, tile in pairs(match) do
+                self.score = self.score + tile.variety * 50
+            end
             self.timer = math.min(60, self.timer + #match)
         end
 
