@@ -161,7 +161,20 @@ function PlayState:update(dt)
                 })
                 -- once the swap is finished, we can tween falling blocks as needed
                 :finish(function()
-                    self:calculateMatches()
+                    local tile1, tile2 = self.highlightedTile, newTile
+                    local matches = self:calculateMatches()
+                    if not matches then
+                      gSounds['error']:stop()
+                      gSounds['error']:play()
+                      tile1.gridX, tile2.gridX = tile2.gridX, tile1.gridX
+                      tile1.gridY, tile2.gridY = tile2.gridY, tile1.gridY
+                      self.board.tiles[tile1.gridY][tile1.gridX] = tile1
+                      self.board.tiles[tile2.gridY][tile2.gridX] = tile2
+                      Timer = Timer.tween(0.1, {
+                        [tile1] = { x = tile2.x, y = tile2.y },
+                        [tile2] = { x = tile1.x, y = tile1.y },
+                      }):finish(function() end)
+                    end
                 end)
             end
         end
@@ -217,6 +230,8 @@ function PlayState:calculateMatches()
     else
         self.canInput = true
     end
+
+    return matches
 end
 
 function PlayState:render()
