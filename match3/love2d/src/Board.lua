@@ -47,7 +47,7 @@ function Board:initializeTiles()
         end
     end
 
-    while self:calculateMatches() do
+    while self:calculateMatches() or not self:hasMoves() do
         -- recursively initialize if matches were returned so we always have
         -- a matchless board on start
         self:initializeTiles()
@@ -202,6 +202,157 @@ function Board:removeMatches()
     end
 
     self.matches = nil
+end
+
+function Board:canMoveUp(x, y)
+  if y <= 1 then
+    return false
+  elseif
+    x > 2 and
+    self.tiles[y][x].color == self.tiles[y - 1][x - 1].color and
+    self.tiles[y][x].color == self.tiles[y - 1][x - 2].color
+  then
+    return true
+  elseif
+    x > 1 and
+    x < 8 and
+    self.tiles[y][x].color == self.tiles[y - 1][x - 1].color and
+    self.tiles[y][x].color == self.tiles[y - 1][x + 1].color
+  then
+    return true
+  elseif
+    x < 7 and
+    self.tiles[y][x].color == self.tiles[y - 1][x + 1].color and
+    self.tiles[y][x].color == self.tiles[y - 1][x + 2].color
+  then
+    return true
+  elseif
+    y > 3 and
+    self.tiles[y][x].color == self.tiles[y - 2][x].color and
+    self.tiles[y][x].color == self.tiles[y - 3][x].color
+  then
+    return true
+  else
+    return false
+  end
+end
+
+function Board:canMoveDown(x, y)
+  if y > 7 then
+    return false
+  elseif
+    x > 2 and
+    self.tiles[y][x].color == self.tiles[y + 1][x - 1].color and
+    self.tiles[y][x].color == self.tiles[y + 1][x - 2].color
+  then
+    return true
+  elseif
+    x > 1 and
+    x < 8 and
+    self.tiles[y][x].color == self.tiles[y + 1][x - 1].color and
+    self.tiles[y][x].color == self.tiles[y + 1][x + 1].color
+  then
+    return true
+  elseif
+    x < 7 and
+    self.tiles[y][x].color == self.tiles[y + 1][x + 1].color and
+    self.tiles[y][x].color == self.tiles[y + 1][x + 2].color
+  then
+    return true
+  elseif
+    y < 6 and
+    self.tiles[y][x].color == self.tiles[y + 2][x].color and
+    self.tiles[y][x].color == self.tiles[y + 3][x].color
+  then
+    return true
+  else
+    return false
+  end
+end
+
+function Board:canMoveLeft(x, y)
+  if x < 2 then
+    return false
+  elseif
+    y > 2 and
+    self.tiles[y][x].color == self.tiles[y - 1][x - 1].color and
+    self.tiles[y][x].color == self.tiles[y - 2][x - 1].color
+  then
+    return true
+  elseif
+    y > 1 and
+    y < 8 and
+    self.tiles[y][x].color == self.tiles[y - 1][x - 1].color and
+    self.tiles[y][x].color == self.tiles[y + 1][x - 1].color
+  then
+    return true
+  elseif
+    y < 7 and
+    self.tiles[y][x].color == self.tiles[y + 1][x - 1].color and
+    self.tiles[y][x].color == self.tiles[y + 2][x - 1].color
+  then
+    return true
+  elseif
+    x > 3 and
+    self.tiles[y][x].color == self.tiles[y][x - 2].color and
+    self.tiles[y][x].color == self.tiles[y][x - 3].color
+  then
+    return true
+  else
+    return false
+  end
+end
+
+function Board:canMoveRight(x, y)
+  if x > 7 then
+    return false
+  elseif
+    y > 2 and
+    self.tiles[y][x].color == self.tiles[y - 1][x + 1].color and
+    self.tiles[y][x].color == self.tiles[y - 2][x + 1].color
+  then
+    return true
+  elseif
+    y > 1 and
+    y < 8 and
+    self.tiles[y][x].color == self.tiles[y - 1][x + 1].color and
+    self.tiles[y][x].color == self.tiles[y + 1][x + 1].color
+  then
+    return true
+  elseif
+    y < 7 and
+    self.tiles[y][x].color == self.tiles[y + 1][x + 1].color and
+    self.tiles[y][x].color == self.tiles[y + 2][x + 1].color
+  then
+    return true
+  elseif
+    x < 6 and
+    self.tiles[y][x].color == self.tiles[y][x + 2].color and
+    self.tiles[y][x].color == self.tiles[y][x + 3].color
+  then
+    return true
+  else
+    return false
+  end
+end
+
+function Board:hasMoves()
+  hasMoves = false
+  for y = 1, #self.tiles do
+    for x = 1, #self.tiles[y] do
+      if
+        self:canMoveLeft(x, y) or
+        self:canMoveRight(x, y) or
+        self:canMoveUp(x, y) or
+        self:canMoveDown(x, y)
+      then
+        hasMoves = true
+        break
+      end
+    end
+  end
+
+  return hasMoves
 end
 
 --[[
