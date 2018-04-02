@@ -13,6 +13,16 @@
 
 Board = Class{}
 
+local ALLOWED_COLORS = {
+  1,
+  5,
+  6,
+  9,
+  10,
+  15,
+  16
+}
+
 function Board:init(x, y, level)
     self.x = x
     self.y = y
@@ -33,7 +43,7 @@ function Board:initializeTiles()
 
         for tileX = 1, 8 do
             -- create a new tile at X,Y with a random color and variety
-            table.insert(self.tiles[tileY], Tile(tileX, tileY, math.random(18), math.random(self.maxVariety), math.random(128) == 1))
+            table.insert(self.tiles[tileY], Tile(tileX, tileY, ALLOWED_COLORS[math.random(#ALLOWED_COLORS)], math.random(self.maxVariety), math.random(128) == 1))
         end
     end
 
@@ -251,7 +261,7 @@ function Board:getFallingTiles()
 
             -- if the tile is nil, we need to add a new one
             if not tile then
-                local tile = Tile(x, y, math.random(18), math.random(self.maxVariety), math.random(128) == 1)
+                local tile = Tile(x, y, ALLOWED_COLORS[math.random(#ALLOWED_COLORS)], math.random(self.maxVariety), math.random(128) == 1)
                 tile.y = -32
                 self.tiles[y][x] = tile
 
