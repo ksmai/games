@@ -37,21 +37,24 @@ function PlayState:init()
 
     self.score = 0
     self.timer = 60
+    self.timers = {}
+    self.swapTimer = nil
+    self.fallTimer = nil
 
     -- set our Timer class to turn cursor highlight on and off
-    Timer.every(0.5, function()
+    table.insert(self.timers, Timer.every(0.5, function()
         self.rectHighlighted = not self.rectHighlighted
-    end)
+    end))
 
     -- subtract 1 from timer every second
-    Timer.every(1, function()
+    table.insert(self.timers, Timer.every(1, function()
         self.timer = self.timer - 1
 
         -- play warning sound on timer if we get low
         if self.timer <= 5 then
             gSounds['clock']:play()
         end
-    end)
+    end))
 end
 
 function PlayState:enter(params)
@@ -68,6 +71,19 @@ function PlayState:enter(params)
     self.scoreGoal = self.level * 1.25 * 1000
 end
 
+function PlayState:exit()
+    -- clear timers from prior PlayStates
+    -- [[
+    for i, timer in pairs(self.timers) do
+      timer:remove()
+    end
+    self.timers = {}
+    if self.fallTimer then
+      self.fallTimer:remove()
+      self.fallTimer = nil
+    end
+end
+
 function PlayState:update(dt)
     if love.keyboard.wasPressed('escape') then
         love.event.quit()
@@ -75,23 +91,16 @@ function PlayState:update(dt)
 
     -- go back to start if time runs out
     if self.timer <= 0 then
-        -- clear timers from prior PlayStates
-        Timer.clear()
-        
         gSounds['game-over']:play()
 
         gStateMachine:change('game-over', {
-            score = self.score
+            score = self.score,
+            reason = 'TIME UP'
         })
     end
 
     -- go to next level if we surpass score goal
     if self.score >= self.scoreGoal then
-        -- clear timers from prior PlayStates
-        -- always clear before you change state, else next state's timers
-        -- will also clear!
-        Timer.clear()
-
         gSounds['next-level']:play()
 
         -- change to begin game state with new level (incremented)
@@ -180,8 +189,14 @@ function PlayState:update(dt)
         end
     end
 
-    Timer.update(dt)
     self.board:update(dt)
+    Timer.update(dt, self.timers)
+    if self.swapTimer then
+      Timer.update(dt, { self.swapTimer })
+    end
+    if self.fallTimer then
+      Timer.update(dt, { self.fallTimer })
+    end
 end
 
 --[[
@@ -215,14 +230,15 @@ function PlayState:calculateMatches()
         local tilesToFall = self.board:getFallingTiles()
 
         -- first, tween the falling tiles over 0.25s
-        Timer.tween(0.25, tilesToFall):finish(function()
+        self.fallTimer = Timer.tween(0.25, tilesToFall):finish(function()
             local newTiles = self.board:getNewTiles()
             
             -- then, tween new tiles that spawn from the ceiling over 0.25s to fill in
             -- the new upper gaps that exist
-            Timer.tween(0.25, newTiles):finish(function()
+            self.fallTimer = Timer.tween(0.25, newTiles):finish(function()
                 -- recursively call function in case new matches have been created
                 -- as a result of falling blocks once new blocks have finished falling
+                self.fallTimer = nil
                 self:calculateMatches()
             end)
         end)
