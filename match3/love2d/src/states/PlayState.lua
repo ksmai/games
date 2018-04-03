@@ -147,44 +147,8 @@ function PlayState:update(dt)
                 self.highlightedTile = nil
             else
                 -- swap grid positions of tiles
-                local tempX = self.highlightedTile.gridX
-                local tempY = self.highlightedTile.gridY
-
                 local newTile = self.board.tiles[y][x]
-
-                self.highlightedTile.gridX = newTile.gridX
-                self.highlightedTile.gridY = newTile.gridY
-                newTile.gridX = tempX
-                newTile.gridY = tempY
-
-                -- swap tiles in the tiles table
-                self.board.tiles[self.highlightedTile.gridY][self.highlightedTile.gridX] =
-                    self.highlightedTile
-
-                self.board.tiles[newTile.gridY][newTile.gridX] = newTile
-
-                -- tween coordinates between the two so they swap
-                Timer.tween(0.1, {
-                    [self.highlightedTile] = {x = newTile.x, y = newTile.y},
-                    [newTile] = {x = self.highlightedTile.x, y = self.highlightedTile.y}
-                })
-                -- once the swap is finished, we can tween falling blocks as needed
-                :finish(function()
-                    local tile1, tile2 = self.highlightedTile, newTile
-                    local matches = self:calculateMatches()
-                    if not matches then
-                      gSounds['error']:stop()
-                      gSounds['error']:play()
-                      tile1.gridX, tile2.gridX = tile2.gridX, tile1.gridX
-                      tile1.gridY, tile2.gridY = tile2.gridY, tile1.gridY
-                      self.board.tiles[tile1.gridY][tile1.gridX] = tile1
-                      self.board.tiles[tile2.gridY][tile2.gridX] = tile2
-                      Timer = Timer.tween(0.1, {
-                        [tile1] = { x = tile2.x, y = tile2.y },
-                        [tile2] = { x = tile1.x, y = tile1.y },
-                      }):finish(function() end)
-                    end
-                end)
+                self:trySwapTiles(self.highlightedTile, newTile)
             end
         end
     end
@@ -197,6 +161,47 @@ function PlayState:update(dt)
     if self.fallTimer then
       Timer.update(dt, { self.fallTimer })
     end
+end
+
+function PlayState:trySwapTiles(tile1, tile2)
+    tile1.gridX, tile2.gridX = tile2.gridX, tile1.gridX
+    tile1.gridY, tile2.gridY = tile2.gridY, tile1.gridY
+    -- swap tiles in the tiles table
+    self.board.tiles[tile1.gridY][tile1.gridX] = tile1
+    self.board.tiles[tile2.gridY][tile2.gridX] = tile2
+
+    -- tween coordinates between the two so they swap
+    self.swapTimer = Timer.tween(0.1, {
+        [tile1] = {x = tile2.x, y = tile2.y},
+        [tile2] = {x = tile1.x, y = tile1.y}
+    })
+    -- once the swap is finished, we can tween falling blocks as needed
+    :finish(function()
+        local matches = self:calculateMatches()
+        if not matches then
+          gSounds['error']:stop()
+          gSounds['error']:play()
+          tile1.gridX, tile2.gridX = tile2.gridX, tile1.gridX
+          tile1.gridY, tile2.gridY = tile2.gridY, tile1.gridY
+          self.board.tiles[tile1.gridY][tile1.gridX] = tile1
+          self.board.tiles[tile2.gridY][tile2.gridX] = tile2
+          self.swapTimer = Timer.tween(0.1, {
+            [tile1] = { x = tile2.x, y = tile2.y },
+            [tile2] = { x = tile1.x, y = tile1.y },
+          }):finish(function() self.swapTimer = nil end)
+        else
+            self.swapTimer = nil
+            -- go back to start if no more moves available
+            if not self.board:hasMoves() then
+                gSounds['game-over']:play()
+
+                gStateMachine:change('game-over', {
+                    score = self.score,
+                    reason = 'NO MORE'
+                })
+            end
+        end
+    end)
 end
 
 --[[
