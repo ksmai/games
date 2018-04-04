@@ -54,6 +54,19 @@ function Board:initializeTiles()
     end
 end
 
+function Board:getTileFromMouseXY(x, y)
+  gameX, gameY = push:toGame(x, y)
+  row = math.floor((gameY - self.y) / 32) + 1
+  col = math.floor((gameX - self.x) / 32) + 1
+  if row > 0 and row <= #self.tiles then
+    if col > 0 and col <= #self.tiles[row] then
+      return self.tiles[row][col]
+    end
+  end
+
+  return nil
+end
+
 --[[
     Goes left to right, top to bottom in the board, calculating matches by counting consecutive
     tiles of the same color. Doesn't need to check the last tile in every row or column if the 

@@ -74,6 +74,7 @@ function love.load()
 
     -- initialize input table
     love.keyboard.keysPressed = {}
+    love.mouse.buttonPressed = nil
 end
 
 function love.resize(w, h)
@@ -83,6 +84,14 @@ end
 function love.keypressed(key)
     -- add to our table of keys pressed this frame
     love.keyboard.keysPressed[key] = true
+end
+
+function love.mousepressed(x, y, button)
+    love.mouse.buttonPressed = {
+      x = x,
+      y = y,
+      button = button
+    }
 end
 
 function love.keyboard.wasPressed(key)
@@ -105,6 +114,7 @@ function love.update(dt)
     gStateMachine:update(dt)
 
     love.keyboard.keysPressed = {}
+    love.mouse.buttonPressed = nil
 end
 
 function love.draw()

@@ -126,6 +126,31 @@ function PlayState:update(dt)
             gSounds['select']:play()
         end
 
+        local mousePress = love.mouse.buttonPressed
+        if mousePress then
+          local pressedTile = self.board:getTileFromMouseXY(mousePress.x, mousePress.y)
+          if pressedTile then
+            if not self.highlightedTile then
+                self.highlightedTile = pressedTile
+                self.boardHighlightX = self.highlightedTile.gridX - 1
+                self.boardHighlightY = self.highlightedTile.gridY - 1
+            elseif self.highlightedTile == pressedTile then
+                self.highlightedTile = nil
+            elseif math.abs(self.highlightedTile.gridX - pressedTile.gridX) + math.abs(self.highlightedTile.gridY - pressedTile.gridY) > 1 then
+                gSounds['error']:play()
+                self.highlightedTile = nil
+            else
+                -- swap grid positions of tiles
+                self.boardHighlightX = pressedTile.gridX - 1
+                self.boardHighlightY = pressedTile.gridY - 1
+                self:trySwapTiles(self.highlightedTile, pressedTile)
+            end
+          else
+            gSounds['error']:stop()
+            gSounds['error']:play()
+          end
+        end
+
         -- if we've pressed enter, to select or deselect a tile...
         if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
             -- if same tile as currently highlighted, deselect
