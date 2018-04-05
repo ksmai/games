@@ -20,6 +20,7 @@ function LevelMaker.generate(width, height)
     -- whether we should draw our tiles with toppers
     local topper = true
     -- whether we should generate a level with lock and key
+    local theLock = nil
     local lockAndKey = true
     local lockSpawned = false -- only one lock per level
     local keySpawned = false
@@ -77,14 +78,21 @@ function LevelMaker.generate(width, height)
                     )
                 elseif lockAndKey and not lockSpawned and math.random(10000)/10000 <= (x / width) ^ 5 then
                     lockSpawned = true
-                    table.insert(objects, GameObject{
+                    theLock = GameObject{
                       texture = 'keys-and-locks',
                       x = (x - 1) * TILE_SIZE,
                       y = (5 - 1) * TILE_SIZE - 16,
                       width = 16,
                       height = 16,
+                      collidable = true,
+                      consumable = false,
+                      solid = true,
+                      onCollide = function(object)
+                        gSounds['empty-block']:play()
+                      end,
                       frame = LOCKS[math.random(#LOCKS)]
-                    })
+                    }
+                    table.insert(objects, theLock)
                 elseif lockAndKey and not keySpawned and lockSpawned and math.random(10000)/10000 <= (x / width) ^ 5 then
                     keySpawned = true
                     table.insert(objects, GameObject{
@@ -93,7 +101,20 @@ function LevelMaker.generate(width, height)
                       y = (5 - 1) * TILE_SIZE - 16,
                       width = 16,
                       height = 16,
-                      frame = KEYS[math.random(#KEYS)]
+                      frame = KEYS[math.random(#KEYS)],
+                      collidable = true,
+                      consumable = true,
+                      solid = false,
+                      onConsume = function(player, object)
+                        gSounds['pickup']:play()
+                        for k, obj in pairs(objects) do
+                          if obj == theLock then
+                            objects[k] = nil
+                            theLock = nil
+                            break
+                          end
+                        end
+                      end
                     })
                 end
                 
@@ -117,14 +138,21 @@ function LevelMaker.generate(width, height)
                 )
             elseif lockAndKey and not lockSpawned and math.random(10000) / 10000 <= (x / width) ^ 5 then
                 lockSpawned = true
-                table.insert(objects, GameObject{
+                theLock = GameObject{
                   texture = 'keys-and-locks',
                   x = (x - 1) * TILE_SIZE,
                   y = (7 - 1) * TILE_SIZE - 16,
                   width = 16,
                   height = 16,
-                  frame = LOCKS[math.random(#LOCKS)]
-                })
+                  frame = LOCKS[math.random(#LOCKS)],
+                  collidable = true,
+                  consumable = false,
+                  solid = true,
+                  onCollide = function(object)
+                    gSounds['empty-block']:play()
+                  end
+                }
+                table.insert(objects, theLock)
             elseif lockAndKey and not keySpawned and lockSpawned and math.random(10000) / 10000 <= (x / width) ^ 5 then
                 keySpawned = true
                 table.insert(objects, GameObject{
@@ -133,7 +161,20 @@ function LevelMaker.generate(width, height)
                   y = (7 - 1) * TILE_SIZE - 16,
                   width = 16,
                   height = 16,
-                  frame = KEYS[math.random(#KEYS)]
+                  frame = KEYS[math.random(#KEYS)],
+                  collidable = true,
+                  consumable = true,
+                  solid = false,
+                  onConsume = function(player, object)
+                    gSounds['pickup']:play()
+                    for k, obj in pairs(objects) do
+                      if obj == theLock then
+                        objects[k] = nil
+                        theLock = nil
+                        break
+                      end
+                    end
+                  end
                 })
             end
 
