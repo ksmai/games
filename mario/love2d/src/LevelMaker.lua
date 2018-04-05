@@ -237,7 +237,10 @@ function LevelMaker.generate(width, height)
 
                             onConsume = function(player, object)
                                 gSounds['win']:play()
-                                gStateMachine:change('start')
+                                gStateMachine:change('play', {
+                                  score = player.score,
+                                  gameLevel = player.gameLevel + 1,
+                                })
                             end
                           })
                           table.insert(objects, GameObject{
@@ -258,7 +261,10 @@ function LevelMaker.generate(width, height)
 
                             onConsume = function(player, object)
                                 gSounds['win']:play()
-                                gStateMachine:change('start')
+                                gStateMachine:change('play', {
+                                  score = player.score,
+                                  gameLevel = player.gameLevel + 1,
+                                })
                             end
                           })
                         elseif o.x == postX then
