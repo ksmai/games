@@ -10,7 +10,11 @@ PlayState = Class{__includes = BaseState}
 function PlayState:init()
     self.camX = 0
     self.camY = 0
-    self.level = LevelMaker.generate(100, 10)
+    local firstGround = nil
+    repeat
+      self.level = LevelMaker.generate(100, 10)
+      firstGroundTile = self.level.tileMap:getFirstGroundTile()
+    until firstGroundTile
     self.tileMap = self.level.tileMap
     self.background = math.random(3)
     self.backgroundX = 0
@@ -19,7 +23,7 @@ function PlayState:init()
     self.gravityAmount = 6
 
     self.player = Player({
-        x = 0, y = 0,
+        x = (firstGroundTile.x - 1) * TILE_SIZE, y = 0,
         width = 16, height = 20,
         texture = 'green-alien',
         stateMachine = StateMachine {

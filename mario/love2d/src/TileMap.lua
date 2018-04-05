@@ -39,3 +39,15 @@ function TileMap:render()
         end
     end
 end
+
+function TileMap:getFirstGroundTile()
+  for x = 1, self.width do
+    for y = 1, self.height do
+      if self.tiles[y][x].id == TILE_ID_GROUND then
+        return self.tiles[y][x]
+      end
+    end
+  end
+
+  return nil
+end
