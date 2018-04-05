@@ -19,6 +19,10 @@ function LevelMaker.generate(width, height)
     
     -- whether we should draw our tiles with toppers
     local topper = true
+    -- whether we should generate a level with lock and key
+    local lockAndKey = true
+    local lockSpawned = false -- only one lock per level
+    local keySpawned = false
     local tileset = math.random(20)
     local topperset = math.random(20)
 
@@ -71,6 +75,26 @@ function LevelMaker.generate(width, height)
                             frame = BUSH_IDS[math.random(#BUSH_IDS)] + (math.random(4) - 1) * 7
                         }
                     )
+                elseif lockAndKey and not lockSpawned and math.random(10000)/10000 <= (x / width) ^ 5 then
+                    lockSpawned = true
+                    table.insert(objects, GameObject{
+                      texture = 'keys-and-locks',
+                      x = (x - 1) * TILE_SIZE,
+                      y = (5 - 1) * TILE_SIZE - 16,
+                      width = 16,
+                      height = 16,
+                      frame = LOCKS[math.random(#LOCKS)]
+                    })
+                elseif lockAndKey and not keySpawned and lockSpawned and math.random(10000)/10000 <= (x / width) ^ 5 then
+                    keySpawned = true
+                    table.insert(objects, GameObject{
+                      texture = 'keys-and-locks',
+                      x = (x - 1) * TILE_SIZE,
+                      y = (5 - 1) * TILE_SIZE - 16,
+                      width = 16,
+                      height = 16,
+                      frame = KEYS[math.random(#KEYS)]
+                    })
                 end
                 
                 -- pillar tiles
@@ -91,6 +115,26 @@ function LevelMaker.generate(width, height)
                         collidable = false
                     }
                 )
+            elseif lockAndKey and not lockSpawned and math.random(10000) / 10000 <= (x / width) ^ 5 then
+                lockSpawned = true
+                table.insert(objects, GameObject{
+                  texture = 'keys-and-locks',
+                  x = (x - 1) * TILE_SIZE,
+                  y = (7 - 1) * TILE_SIZE - 16,
+                  width = 16,
+                  height = 16,
+                  frame = LOCKS[math.random(#LOCKS)]
+                })
+            elseif lockAndKey and not keySpawned and lockSpawned and math.random(10000) / 10000 <= (x / width) ^ 5 then
+                keySpawned = true
+                table.insert(objects, GameObject{
+                  texture = 'keys-and-locks',
+                  x = (x - 1) * TILE_SIZE,
+                  y = (7 - 1) * TILE_SIZE - 16,
+                  width = 16,
+                  height = 16,
+                  frame = KEYS[math.random(#KEYS)]
+                })
             end
 
             -- chance to spawn a block
