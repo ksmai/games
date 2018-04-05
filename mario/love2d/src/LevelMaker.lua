@@ -81,7 +81,7 @@ function LevelMaker.generate(width, height)
                     theLock = GameObject{
                       texture = 'keys-and-locks',
                       x = (x - 1) * TILE_SIZE,
-                      y = (5 - 1) * TILE_SIZE - 16,
+                      y = (4 - 1) * TILE_SIZE - 16,
                       width = 16,
                       height = 16,
                       collidable = true,
@@ -98,7 +98,7 @@ function LevelMaker.generate(width, height)
                     table.insert(objects, GameObject{
                       texture = 'keys-and-locks',
                       x = (x - 1) * TILE_SIZE,
-                      y = (5 - 1) * TILE_SIZE - 16,
+                      y = (4 - 1) * TILE_SIZE - 16,
                       width = 16,
                       height = 16,
                       frame = KEYS[math.random(#KEYS)],
@@ -141,7 +141,7 @@ function LevelMaker.generate(width, height)
                 theLock = GameObject{
                   texture = 'keys-and-locks',
                   x = (x - 1) * TILE_SIZE,
-                  y = (7 - 1) * TILE_SIZE - 16,
+                  y = (6 - 1) * TILE_SIZE - 16,
                   width = 16,
                   height = 16,
                   frame = LOCKS[math.random(#LOCKS)],
@@ -158,7 +158,7 @@ function LevelMaker.generate(width, height)
                 table.insert(objects, GameObject{
                   texture = 'keys-and-locks',
                   x = (x - 1) * TILE_SIZE,
-                  y = (7 - 1) * TILE_SIZE - 16,
+                  y = (6 - 1) * TILE_SIZE - 16,
                   width = 16,
                   height = 16,
                   frame = KEYS[math.random(#KEYS)],
