@@ -24,6 +24,7 @@ function LevelMaker.generate(width, height)
     local lockAndKey = true
     local lockSpawned = false -- only one lock per level
     local keySpawned = false
+    local unlockable = false
     local tileset = math.random(20)
     local topperset = math.random(20)
 
@@ -76,29 +77,12 @@ function LevelMaker.generate(width, height)
                             frame = BUSH_IDS[math.random(#BUSH_IDS)] + (math.random(4) - 1) * 7
                         }
                     )
-                elseif lockAndKey and not lockSpawned and math.random(10000)/10000 <= (x / width) ^ 5 then
-                    lockSpawned = true
-                    theLock = GameObject{
-                      texture = 'keys-and-locks',
-                      x = (x - 1) * TILE_SIZE,
-                      y = (4 - 1) * TILE_SIZE - 16,
-                      width = 16,
-                      height = 16,
-                      collidable = true,
-                      consumable = false,
-                      solid = true,
-                      onCollide = function(object)
-                        gSounds['empty-block']:play()
-                      end,
-                      frame = LOCKS[math.random(#LOCKS)]
-                    }
-                    table.insert(objects, theLock)
-                elseif lockAndKey and not keySpawned and lockSpawned and math.random(10000)/10000 <= (x / width) ^ 5 then
+                elseif lockAndKey and not keySpawned and math.random(10000)/10000 <= (x / width) ^ 5 then
                     keySpawned = true
                     table.insert(objects, GameObject{
                       texture = 'keys-and-locks',
                       x = (x - 1) * TILE_SIZE,
-                      y = (4 - 1) * TILE_SIZE - 16,
+                      y = (5 - 1) * TILE_SIZE - 16,
                       width = 16,
                       height = 16,
                       frame = KEYS[math.random(#KEYS)],
@@ -108,11 +92,7 @@ function LevelMaker.generate(width, height)
                       onConsume = function(player, object)
                         gSounds['pickup']:play()
                         for k, obj in pairs(objects) do
-                          if obj == theLock then
-                            objects[k] = nil
-                            theLock = nil
-                            break
-                          end
+                          unlockable = true
                         end
                       end
                     })
@@ -136,29 +116,12 @@ function LevelMaker.generate(width, height)
                         collidable = false
                     }
                 )
-            elseif lockAndKey and not lockSpawned and math.random(10000) / 10000 <= (x / width) ^ 5 then
-                lockSpawned = true
-                theLock = GameObject{
-                  texture = 'keys-and-locks',
-                  x = (x - 1) * TILE_SIZE,
-                  y = (6 - 1) * TILE_SIZE - 16,
-                  width = 16,
-                  height = 16,
-                  frame = LOCKS[math.random(#LOCKS)],
-                  collidable = true,
-                  consumable = false,
-                  solid = true,
-                  onCollide = function(object)
-                    gSounds['empty-block']:play()
-                  end
-                }
-                table.insert(objects, theLock)
-            elseif lockAndKey and not keySpawned and lockSpawned and math.random(10000) / 10000 <= (x / width) ^ 5 then
+            elseif lockAndKey and not keySpawned and math.random(10000) / 10000 <= (x / width) ^ 5 then
                 keySpawned = true
                 table.insert(objects, GameObject{
                   texture = 'keys-and-locks',
                   x = (x - 1) * TILE_SIZE,
-                  y = (6 - 1) * TILE_SIZE - 16,
+                  y = (7 - 1) * TILE_SIZE - 16,
                   width = 16,
                   height = 16,
                   frame = KEYS[math.random(#KEYS)],
@@ -168,11 +131,7 @@ function LevelMaker.generate(width, height)
                   onConsume = function(player, object)
                     gSounds['pickup']:play()
                     for k, obj in pairs(objects) do
-                      if obj == theLock then
-                        objects[k] = nil
-                        theLock = nil
-                        break
-                      end
+                      unlockable = true
                     end
                   end
                 })
@@ -240,6 +199,32 @@ function LevelMaker.generate(width, height)
                         end
                     }
                 )
+            elseif lockAndKey and not lockSpawned and math.random(10000)/10000 <= (x / width) ^ 5 then
+                lockSpawned = true
+                theLock = GameObject{
+                  texture = 'keys-and-locks',
+                  x = (x - 1) * TILE_SIZE,
+                  y = (blockHeight - 1) * TILE_SIZE,
+                  width = 16,
+                  height = 16,
+                  collidable = true,
+                  consumable = false,
+                  solid = true,
+                  onCollide = function(object)
+                    gSounds['empty-block']:play()
+                    if unlockable then
+                      for k, o in pairs(objects) do
+                        if o == object then
+                          objects[k] = nil
+                          theLock = nil
+                          break
+                        end
+                      end
+                    end
+                  end,
+                  frame = LOCKS[math.random(#LOCKS)]
+                }
+                table.insert(objects, theLock)
             end
         end
     end
