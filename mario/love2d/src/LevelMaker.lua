@@ -14,6 +14,7 @@ function LevelMaker.generate(width, height)
     local tiles = {}
     local entities = {}
     local objects = {}
+    local map
 
     local tileID = TILE_ID_GROUND
     
@@ -217,7 +218,51 @@ function LevelMaker.generate(width, height)
                         if o == object then
                           objects[k] = nil
                           theLock = nil
-                          break
+                          local lastGroundTile = map:getEndOfLevelGroundTile()
+                          local postX = (lastGroundTile.x - 1) * TILE_SIZE
+                          local flagX = postX + 8
+                          local flagY = (lastGroundTile.y - 1 - math.random(3)) * TILE_SIZE
+                          local postY = (lastGroundTile.y - 1 - 3) * TILE_SIZE
+                          local flagFrame = FLAGS[math.random(#FLAGS)]
+                          table.insert(objects, GameObject{
+                            texture = 'flags',
+                            x = postX,
+                            y = postY,
+                            width = 16,
+                            height = 48,
+                            frame = POSTS[math.random(#POSTS)],
+                            collidable = true,
+                            consumable = true,
+                            solid = false,
+
+                            onConsume = function(player, object)
+                                gSounds['win']:play()
+                                gStateMachine:change('start')
+                            end
+                          })
+                          table.insert(objects, GameObject{
+                            texture = 'flags',
+                            x = flagX,
+                            y = flagY,
+                            width = 16,
+                            height = 16,
+                            frame = flagFrame,
+                            collidable = true,
+                            consumable = true,
+                            solid = false,
+                            direction = 'right',
+                            animation = Animation{
+                              frames = { flagFrame, flagFrame + 1, flagFrame + 2 },
+                              interval = 0.1
+                            },
+
+                            onConsume = function(player, object)
+                                gSounds['win']:play()
+                                gStateMachine:change('start')
+                            end
+                          })
+                        elseif o.x == postX then
+                            objects[k] = nil -- remove other objects at this loaction
                         end
                       end
                     end
@@ -229,7 +274,7 @@ function LevelMaker.generate(width, height)
         end
     end
 
-    local map = TileMap(width, height)
+    map = TileMap(width, height)
     map.tiles = tiles
     
     return GameLevel(entities, objects, map)

@@ -62,7 +62,8 @@ gSounds = {
     ['pickup'] = love.audio.newSource('sounds/pickup.wav'),
     ['empty-block'] = love.audio.newSource('sounds/empty-block.wav'),
     ['kill'] = love.audio.newSource('sounds/kill.wav'),
-    ['kill2'] = love.audio.newSource('sounds/kill2.wav')
+    ['kill2'] = love.audio.newSource('sounds/kill2.wav'),
+    ['win'] = love.audio.newSource('sounds/win.wav'),
 }
 
 gTextures = {
@@ -75,6 +76,7 @@ gTextures = {
     ['green-alien'] = love.graphics.newImage('graphics/green_alien.png'),
     ['creatures'] = love.graphics.newImage('graphics/creatures.png'),
     ['keys-and-locks'] = love.graphics.newImage('graphics/keys_and_locks.png'),
+    ['flags'] = love.graphics.newImage('graphics/flags.png'),
 }
 
 gFrames = {
@@ -89,6 +91,7 @@ gFrames = {
     ['green-alien'] = GenerateQuads(gTextures['green-alien'], 16, 20),
     ['creatures'] = GenerateQuads(gTextures['creatures'], 16, 16),
     ['keys-and-locks'] = GenerateQuads(gTextures['keys-and-locks'], 16, 16),
+    ['flags'] = GenerateFlagQuads(gTextures['flags']),
 }
 
 -- these need to be added after gFrames is initialized because they refer to gFrames from within

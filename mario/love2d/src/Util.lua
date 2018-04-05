@@ -62,6 +62,32 @@ function GenerateTileSets(quads, setsX, setsY, sizeX, sizeY)
     return tilesets
 end
 
+function GenerateFlagQuads(atlas)
+  local quads = {
+  }
+  for i = 1, 6 do
+    table.insert(quads, love.graphics.newQuad(
+      (i - 1) * 16,
+      0,
+      16,
+      48,
+      atlas:getDimensions()
+    ))
+  end
+  for i = 1, 4 do
+    for j = 1, 3 do
+      table.insert(quads, love.graphics.newQuad(
+        96 + (j - 1) * 16,
+        (i - 1) * 16,
+        16,
+        16,
+        atlas:getDimensions()
+      ))
+    end
+  end
+  return quads
+end
+
 --[[
     Recursive table printing function.
     https://coronalabs.com/blog/2014/09/02/tutorial-printing-table-contents/

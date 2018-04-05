@@ -51,3 +51,15 @@ function TileMap:getFirstGroundTile()
 
   return nil
 end
+
+function TileMap:getEndOfLevelGroundTile()
+  for x = self.width, 1, -1 do
+    for y = 1, self.height do
+      if self.tiles[y][x].id == TILE_ID_GROUND then
+        return self.tiles[y][x]
+      end
+    end
+  end
+
+  return nil
+end

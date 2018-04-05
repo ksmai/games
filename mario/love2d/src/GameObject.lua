@@ -21,6 +21,10 @@ function GameObject:init(def)
     self.onCollide = def.onCollide
     self.onConsume = def.onConsume
     self.hit = def.hit
+    self.direction = def.direction or 'left'
+    if def.animation then
+      self.animation = def.animation
+    end
 end
 
 function GameObject:collides(target)
@@ -29,9 +33,12 @@ function GameObject:collides(target)
 end
 
 function GameObject:update(dt)
-
+  if self.animation then
+    self.animation:update(dt)
+    self.frame = self.animation:getCurrentFrame()
+  end
 end
 
 function GameObject:render()
-    love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.frame], self.x, self.y)
+    love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.frame], self.x, self.y, 0, self.direction == 'left' and 1 or -1, 1)
 end
