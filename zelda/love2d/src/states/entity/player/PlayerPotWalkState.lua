@@ -2,6 +2,7 @@ PlayerPotWalkState = Class{__includes = EntityWalkState}
 
 function PlayerPotWalkState:init(player, dungeon)
     EntityWalkState.init(self, player, dungeon)
+    self.potThrown = false
 end
 
 function PlayerPotWalkState:enter(params)
@@ -16,6 +17,13 @@ function PlayerPotWalkState:exit()
 end
 
 function PlayerPotWalkState:update(dt)
+    if self.potThrown then
+        if self.entity.currentAnimation.timesPlayed > 0 then
+            self.entity.stateMachine:change('idle')
+        end
+        return
+    end
+
     if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
         projectile = Projectile(
             GAME_OBJECT_DEFS['pot'],
@@ -33,7 +41,8 @@ function PlayerPotWalkState:update(dt)
         table.insert(self.dungeon.currentRoom.projectiles, projectile)
         gSounds['throw_pot']:stop()
         gSounds['throw_pot']:play()
-        self.entity.stateMachine:change('idle')
+        self.potThrown = true
+        self.entity:changeAnimation('pot-throw-' .. self.entity.direction)
         return
     end
 
@@ -131,5 +140,7 @@ end
 
 function PlayerPotWalkState:render()
     EntityWalkState.render(self)
-    self.pot:render(self.dungeon.currentRoom.adjacentOffsetX, self.dungeon.currentRoom.adjacentOffsetY)
+    if not self.potThrown then
+      self.pot:render(self.dungeon.currentRoom.adjacentOffsetX, self.dungeon.currentRoom.adjacentOffsetY)
+    end
 end

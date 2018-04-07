@@ -6,6 +6,7 @@ function PlayerPotLiftState:init(player, dungeon)
     self.entity.offsetY = 5
     self.entity.offsetX = 0
     self.entity:changeAnimation('pot-lift-' .. self.entity.direction)
+    self.potThrown = false
 end
 
 function PlayerPotLiftState:enter(params)
@@ -22,6 +23,13 @@ function PlayerPotLiftState:exit()
 end
 
 function PlayerPotLiftState:update(dt)
+    if self.potThrown then
+        if self.entity.currentAnimation.timesPlayed > 0 then
+            self.entity.stateMachine:change('idle')
+        end
+        return
+    end
+
     if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
         projectile = Projectile(
             GAME_OBJECT_DEFS['pot'],
@@ -39,7 +47,8 @@ function PlayerPotLiftState:update(dt)
         table.insert(self.dungeon.currentRoom.projectiles, projectile)
         gSounds['throw_pot']:stop()
         gSounds['throw_pot']:play()
-        self.entity.stateMachine:change('idle')
+        self.potThrown = true
+        self.entity:changeAnimation('pot-throw-' .. self.entity.direction)
         return
     end
 
@@ -51,5 +60,7 @@ end
 
 function PlayerPotLiftState:render()
     EntityIdleState.render(self)
-    self.pot:render(self.dungeon.currentRoom.adjacentOffsetX, self.dungeon.currentRoom.adjacentOffsetY)
+    if not self.potThrown then
+      self.pot:render(self.dungeon.currentRoom.adjacentOffsetX, self.dungeon.currentRoom.adjacentOffsetY)
+    end
 end
