@@ -15,6 +15,7 @@ function Projectile:init(def, x, y, direction, dungeon)
     self.direction = direction
     self.state = 'fill'
     self.stopped = false
+    self.canRemove = false
 
     if self.direction == 'left' then
         self.dx = -100
@@ -37,9 +38,19 @@ function Projectile:init(def, x, y, direction, dungeon)
         self.ddx = 0
         self.ddy = -20
     end
+    self.psystem = love.graphics.newParticleSystem(gTextures['particle'], 64)
+    self.psystem:setParticleLifetime(0.5, 1)
+    self.psystem:setLinearAcceleration(-100, -100, 100, 100)
+    self.psystem:setAreaSpread('normal', 5, 5)
+    self.psystem:setColors(
+        79, 144, 149, 55,
+        79, 144, 149, 0
+    )
 end
 
 function Projectile:update(dt)
+    self.psystem:update(dt)
+
     if self.stopped then
         return
     end
@@ -77,4 +88,14 @@ end
 
 function Projectile:stop()
     self.stopped = true
+    gSounds['explode']:stop()
+    gSounds['explode']:play()
+    self.psystem:emit(64)
+    Timer.after(1, function()
+      self.canRemove = true
+    end)
+end
+
+function Projectile:renderParticle(x, y)
+    love.graphics.draw(self.psystem, self.x + x, self.y + y)
 end

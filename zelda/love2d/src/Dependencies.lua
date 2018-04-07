@@ -46,6 +46,7 @@ gTextures = {
     ['character-pot-walk'] = love.graphics.newImage('graphics/character_pot_walk.png'),
     ['character-pot-lift'] = love.graphics.newImage('graphics/character_pot_lift.png'),
     ['hearts'] = love.graphics.newImage('graphics/hearts.png'),
+    ['particle'] = love.graphics.newImage('graphics/particle.png'),
     ['switches'] = love.graphics.newImage('graphics/switches.png'),
     ['entities'] = love.graphics.newImage('graphics/entities.png')
 }
@@ -78,5 +79,8 @@ gSounds = {
     ['hit-player'] = love.audio.newSource('sounds/hit_player.wav'),
     ['pickup_heart'] = love.audio.newSource('sounds/pickup_heart.wav'),
     ['drop_heart'] = love.audio.newSource('sounds/drop_heart.wav'),
+    ['pickup_pot'] = love.audio.newSource('sounds/pickup_pot.wav'),
+    ['throw_pot'] = love.audio.newSource('sounds/throw_pot.wav'),
+    ['explode'] = love.audio.newSource('sounds/explode.wav'),
     ['door'] = love.audio.newSource('sounds/door.wav')
 }

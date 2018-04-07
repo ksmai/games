@@ -236,9 +236,9 @@ function Room:update(dt)
     end
 
     for i = #self.projectiles, 1, -1 do
-      if self.projectiles[i].stopped then
+      if self.projectiles[i].canRemove then
         table.remove(self.projectiles, k)
-      else
+      elseif not self.projectiles[i].stopped then
         self.projectiles[i]:update(dt)
       end
     end
@@ -275,6 +275,7 @@ function Room:render()
         if not projectile.stopped then
             projectile:render(self.adjacentOffsetX, self.adjacentOffsetY)
         end
+        projectile:renderParticle(self.adjacentOffsetX, self.adjacentOffsetY)
     end
 
     -- stencil out the door arches so it looks like the player is going through

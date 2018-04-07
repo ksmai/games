@@ -31,6 +31,8 @@ function PlayerPotWalkState:update(dt)
             end
         end
         table.insert(self.dungeon.currentRoom.projectiles, projectile)
+        gSounds['throw_pot']:stop()
+        gSounds['throw_pot']:play()
         self.entity.stateMachine:change('idle')
         return
     end

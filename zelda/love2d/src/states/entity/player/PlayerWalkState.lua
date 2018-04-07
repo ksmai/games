@@ -114,6 +114,8 @@ function PlayerWalkState:update(dt)
         for k, object in pairs(self.dungeon.currentRoom.objects) do
             if object.type == 'pot' then
                 if math.abs(object.x + object.width / 2 - self.entity.x - self.entity.width / 2) < TILE_SIZE + 5 and math.abs(object.y + object.height / 2 - self.entity.y - self.entity.height / 2) < TILE_SIZE + 5 then
+                  gSounds['pickup_pot']:stop()
+                  gSounds['pickup_pot']:play()
                   self.entity.stateMachine:change('pot-lift', {
                       pot = object
                   })
