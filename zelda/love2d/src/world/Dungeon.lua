@@ -73,10 +73,16 @@ function Dungeon:beginShifting(shiftX, shiftY)
 
     -- tween the camera in whichever direction the new room is in, as well as the player to be
     -- at the opposite door in the next room, walking through the wall (which is stenciled)
-    Timer.tween(1, {
+    plans = {
         [self] = {cameraX = shiftX, cameraY = shiftY},
         [self.player] = {x = playerX, y = playerY}
-    }):finish(function()
+    }
+    thePot = self.player.stateMachine.current.pot
+    if thePot then
+        plans[thePot] = {x = playerX, y = playerY - thePot.height / 2}
+        table.insert(self.nextRoom.objects, thePot)
+    end
+    Timer.tween(1, plans):finish(function()
         self:finishShifting()
 
         -- reset player to the correct location in the room
