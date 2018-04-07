@@ -33,6 +33,12 @@ function EntityWalkState:update(dt)
         if self.entity.x <= MAP_RENDER_OFFSET_X + TILE_SIZE then 
             self.entity.x = MAP_RENDER_OFFSET_X + TILE_SIZE
             self.bumped = true
+        else
+            obj = self:getCollidedObject()
+            if obj then
+                self.entity.x = math.floor(obj.x + obj.width + 1)
+                self.bumped = true
+            end
         end
     elseif self.entity.direction == 'right' then
         self.entity.x = self.entity.x + self.entity.walkSpeed * dt
@@ -40,6 +46,12 @@ function EntityWalkState:update(dt)
         if self.entity.x + self.entity.width >= VIRTUAL_WIDTH - TILE_SIZE * 2 then
             self.entity.x = VIRTUAL_WIDTH - TILE_SIZE * 2 - self.entity.width
             self.bumped = true
+        else
+            obj = self:getCollidedObject()
+            if obj then
+                self.entity.x = math.floor(obj.x - self.entity.width - 1)
+                self.bumped = true
+            end
         end
     elseif self.entity.direction == 'up' then
         self.entity.y = self.entity.y - self.entity.walkSpeed * dt
@@ -47,6 +59,12 @@ function EntityWalkState:update(dt)
         if self.entity.y <= MAP_RENDER_OFFSET_Y + TILE_SIZE - self.entity.height / 2 then 
             self.entity.y = MAP_RENDER_OFFSET_Y + TILE_SIZE - self.entity.height / 2
             self.bumped = true
+        else
+            obj = self:getCollidedObject()
+            if obj then
+                self.entity.y = math.floor(obj.y + obj.height - self.entity.height / 2 + 1)
+                self.bumped = true
+            end
         end
     elseif self.entity.direction == 'down' then
         self.entity.y = self.entity.y + self.entity.walkSpeed * dt
@@ -57,9 +75,25 @@ function EntityWalkState:update(dt)
         if self.entity.y + self.entity.height >= bottomEdge then
             self.entity.y = bottomEdge - self.entity.height
             self.bumped = true
+        else
+            obj = self:getCollidedObject()
+            if obj then
+                self.entity.y = math.floor(obj.y - self.entity.height - 1)
+                self.bumped = true
+            end
         end
     end
 end
+
+function EntityWalkState:getCollidedObject()
+  for k, object in pairs(self.dungeon.currentRoom.objects) do
+    if object.solid and self.entity:collides(object) then
+      return object
+    end
+  end
+  return nil
+end
+
 
 function EntityWalkState:processAI(params, dt)
     local room = params.room
