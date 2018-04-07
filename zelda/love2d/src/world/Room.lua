@@ -156,8 +156,38 @@ function Room:update(dt)
         local entity = self.entities[i]
 
         -- remove entity from the table if health is <= 0
-        if entity.health <= 0 then
+        if entity.health <= 0 and not entity.dead then
             entity.dead = true
+
+            if math.random(100) < 21 then
+                local heartX, heartX2, heartY, heartY2
+                if self.player.x > entity.x then
+                  heartX = math.floor(math.max(MAP_RENDER_OFFSET_X + TILE_SIZE, math.min(VIRTUAL_WIDTH - MAP_RENDER_OFFSET_X - TILE_SIZE - 16, entity.x)))
+                  heartX2 = math.floor(math.max(MAP_RENDER_OFFSET_X + TILE_SIZE, math.min(VIRTUAL_WIDTH - MAP_RENDER_OFFSET_X - TILE_SIZE - 16, heartX - entity.width)))
+                else
+                  heartX = math.floor(math.max(MAP_RENDER_OFFSET_X + TILE_SIZE, math.min(VIRTUAL_WIDTH - MAP_RENDER_OFFSET_X - TILE_SIZE - 16, entity.x + entity.width)))
+                  heartX2 = math.floor(math.max(MAP_RENDER_OFFSET_X + TILE_SIZE, math.min(VIRTUAL_WIDTH - MAP_RENDER_OFFSET_X - TILE_SIZE - 16, heartX + entity.width)))
+                end
+                if self.player.y > entity.y then
+                  heartY = math.floor(math.max(MAP_RENDER_OFFSET_Y + TILE_SIZE, math.min(VIRTUAL_HEIGHT - MAP_RENDER_OFFSET_Y - TILE_SIZE - 16, entity.y)))
+                  heartY2 = math.floor(math.max(MAP_RENDER_OFFSET_Y + TILE_SIZE, math.min(VIRTUAL_HEIGHT - MAP_RENDER_OFFSET_Y - TILE_SIZE - 16, heartY - entity.height)))
+                else
+                  heartY = math.floor(math.max(MAP_RENDER_OFFSET_Y + TILE_SIZE, math.min(VIRTUAL_HEIGHT - MAP_RENDER_OFFSET_Y - TILE_SIZE - 16, entity.y + entity.height)))
+                  heartY2 = math.floor(math.max(MAP_RENDER_OFFSET_Y + TILE_SIZE, math.min(VIRTUAL_HEIGHT - MAP_RENDER_OFFSET_Y - TILE_SIZE - 16, heartY + entity.height)))
+                end
+                heart = GameObject(GAME_OBJECT_DEFS['heart'], heartX, heartY)
+                heart.onConsume = function(obj, player)
+                  player.health = math.min(6, player.health + 2)
+                  gSounds['pickup_heart']:stop()
+                  gSounds['pickup_heart']:play()
+                end
+                table.insert(self.objects, heart)
+                gSounds['drop_heart']:stop()
+                gSounds['drop_heart']:play()
+                Timer.tween(0.1, {
+                  [heart] = { y = heartY2, x = heartX2 }
+                })
+            end
         elseif not entity.dead then
             entity:processAI({room = self}, dt)
             entity:update(dt)
@@ -181,7 +211,16 @@ function Room:update(dt)
         -- trigger collision callback on object
         if self.player:collides(object) then
             object:onCollide()
+            if object.consumable then
+              object:onConsume(self.player)
+              object.consumed = true
+            end
         end
+    end
+    for i = #self.objects, 1, -1 do
+      if self.objects[i].consumed then
+        table.remove(self.objects, i)
+      end
     end
 end
 

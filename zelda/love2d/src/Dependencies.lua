@@ -69,5 +69,7 @@ gSounds = {
     ['sword'] = love.audio.newSource('sounds/sword.wav'),
     ['hit-enemy'] = love.audio.newSource('sounds/hit_enemy.wav'),
     ['hit-player'] = love.audio.newSource('sounds/hit_player.wav'),
+    ['pickup_heart'] = love.audio.newSource('sounds/pickup_heart.wav'),
+    ['drop_heart'] = love.audio.newSource('sounds/drop_heart.wav'),
     ['door'] = love.audio.newSource('sounds/door.wav')
 }
