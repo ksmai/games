@@ -23,7 +23,20 @@ end
 
 function PlayerPotLiftState:update(dt)
     if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
-        print('throw')
+        projectile = Projectile(
+            GAME_OBJECT_DEFS['pot'],
+            self.pot.x,
+            self.pot.y,
+            self.entity.direction,
+            self.dungeon
+        )
+        for k, object in pairs(self.dungeon.currentRoom.objects) do
+            if object == self.pot then
+                table.remove(self.dungeon.currentRoom.objects, k)
+                break
+            end
+        end
+        table.insert(self.dungeon.currentRoom.projectiles, projectile)
         self.entity.stateMachine:change('idle')
         return
     end

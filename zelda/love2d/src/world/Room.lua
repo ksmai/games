@@ -25,6 +25,8 @@ function Room:init(player, dungeon)
     self.objects = {}
     self:generateObjects()
 
+    self.projectiles = {}
+
     -- doorways that lead to other dungeon rooms
     self.doorways = {}
     table.insert(self.doorways, Doorway('top', false, self))
@@ -232,6 +234,15 @@ function Room:update(dt)
         table.remove(self.objects, i)
       end
     end
+
+    for i = #self.projectiles, 1, -1 do
+      if self.projectiles[i].stopped then
+        table.remove(self.projectiles, k)
+      else
+        self.projectiles[i]:update(dt)
+      end
+    end
+        
 end
 
 function Room:render()
@@ -258,6 +269,12 @@ function Room:render()
 
     for k, entity in pairs(self.entities) do
         if not entity.dead then entity:render(self.adjacentOffsetX, self.adjacentOffsetY) end
+    end
+
+    for k, projectile in pairs(self.projectiles) do
+        if not projectile.stopped then
+            projectile:render(self.adjacentOffsetX, self.adjacentOffsetY)
+        end
     end
 
     -- stencil out the door arches so it looks like the player is going through
