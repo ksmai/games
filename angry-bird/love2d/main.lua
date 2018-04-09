@@ -51,7 +51,7 @@ function love.load()
     paused = false
 end
 
-function push.resize(w, h)
+function love.resize(w, h)
     push:resize(w, h)
 end
 
