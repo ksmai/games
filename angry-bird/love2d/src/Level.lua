@@ -120,6 +120,9 @@ function Level:init()
     -- obstacles guarding aliens that we can destroy
     self.obstacles = {}
 
+    -- press space to split into three aliens
+    self.splittedAliens = {}
+
     -- simple edge shape to represent collision for ground
     self.edgeShape = love.physics.newEdgeShape(0, 0, VIRTUAL_WIDTH * 3, 0)
 
@@ -184,18 +187,59 @@ function Level:update(dt)
 
     -- replace launch marker if original alien stopped moving
     if self.launchMarker.launched then
+        local allAliensStopped = true
+
         local xPos, yPos = self.launchMarker.alien.body:getPosition()
         local xVel, yVel = self.launchMarker.alien.body:getLinearVelocity()
         
         -- if we fired our alien to the left or it's almost done rolling, respawn
-        if xPos < 0 or (math.abs(xVel) + math.abs(yVel) < 1.5) then
+        if xPos > 0 and (math.abs(xVel) + math.abs(yVel) > 1.5) then
+            allAliensStopped = false
+        else
+            for k, alien in pairs(self.splittedAliens) do
+                local xPos, yPos = alien.body:getPosition()
+                local xVel, yVel = alien.body:getLinearVelocity()
+                if xPos > 0 and (math.abs(xVel) + math.abs(yVel) > 1.5) then
+                    allAliensStopped = false
+                    break
+                end
+            end
+        end
+
+        if allAliensStopped then
             self.launchMarker.alien.body:destroy()
             self.launchMarker = AlienLaunchMarker(self.world)
+            for k, alien in pairs(self.splittedAliens) do
+                alien.body:destroy()
+            end
+            self.splittedAliens = {}
 
             -- re-initialize level if we have no more aliens
             if #self.aliens == 0 then
                 gStateMachine:change('start')
             end
+        elseif love.keyboard.wasPressed('space') and #self.splittedAliens == 0 and self.launchMarker.alien.body:getY() < VIRTUAL_HEIGHT - TILE_SIZE - ALIEN_SIZE * 2 then
+            local upperAlien = Alien(self.world, 'round', self.launchMarker.alien.body:getX(), self.launchMarker.alien.body:getY(), 'Player')
+            local lowerAlien = Alien(self.world, 'round', self.launchMarker.alien.body:getX(), self.launchMarker.alien.body:getY(), 'Player')
+            local dx, dy = self.launchMarker.alien.body:getLinearVelocity()
+            local dr = math.sqrt(dx * dx + dy * dy)
+            local cos = dx / dr
+            local sin = dy / dr
+            local deg = math.pi / 8
+            local upperDx = dx * math.cos(deg) - dy * math.sin(deg)
+            local upperDy = dx * math.sin(deg) + dy * math.cos(deg)
+            local lowerDx = dx * math.cos(-deg) - dy * math.sin(-deg)
+            local lowerDy = dx * math.sin(-deg) + dy * math.cos(-deg)
+            upperAlien.body:setLinearVelocity(upperDx, upperDy)
+            -- make the alien pretty bouncy
+            upperAlien.fixture:setRestitution(0.4)
+            upperAlien.body:setAngularDamping(1)
+            lowerAlien.body:setLinearVelocity(lowerDx, lowerDy)
+            -- make the alien pretty bouncy
+            lowerAlien.fixture:setRestitution(0.4)
+            lowerAlien.body:setAngularDamping(1)
+            table.insert(self.splittedAliens, upperAlien)
+            table.insert(self.splittedAliens, lowerAlien)
         end
     end
 end
@@ -207,6 +251,10 @@ function Level:render()
     end
 
     self.launchMarker:render()
+
+    for k, alien in pairs(self.splittedAliens) do
+        alien:render()
+    end
 
     for k, alien in pairs(self.aliens) do
         alien:render()
