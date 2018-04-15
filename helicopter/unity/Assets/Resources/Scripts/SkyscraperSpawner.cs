@@ -8,6 +8,8 @@ public class SkyscraperSpawner : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+    // reset the speed
+    speed = 10f;
 
 		// aysnchronous infinite skyscraper spawning
 		StartCoroutine(SpawnSkyscrapers());
