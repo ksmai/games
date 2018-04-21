@@ -14,6 +14,8 @@ public class DieOnFall : MonoBehaviour {
 	void Update () {
     if (transform.position[1] < -2.0f) {
       SceneManager.LoadScene("GameOver");
+      Destroy(DontDestroy.instance.gameObject);
+      DontDestroy.instance = null;
     }
 	}
 }
