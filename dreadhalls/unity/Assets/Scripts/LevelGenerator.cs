@@ -42,10 +42,13 @@ public class LevelGenerator : MonoBehaviour {
 		// create actual maze blocks from maze boolean data
 		for (int z = 0; z < mazeSize; z++) {
 			for (int x = 0; x < mazeSize; x++) {
+        bool isWall = false;
+        bool isPlayer = false;
 				if (mapData[z, x]) {
 					CreateChildPrefab(wallPrefab, wallsParent, x, 1, z);
 					CreateChildPrefab(wallPrefab, wallsParent, x, 2, z);
 					CreateChildPrefab(wallPrefab, wallsParent, x, 3, z);
+          isWall = true;
 				} else if (!characterPlaced) {
 					
 					// place the character controller on the first empty wall we generate
@@ -55,10 +58,13 @@ public class LevelGenerator : MonoBehaviour {
 
 					// flag as placed so we never consider placing again
 					characterPlaced = true;
+          isPlayer = true;
 				}
 
 				// create floor and ceiling
-				CreateChildPrefab(floorPrefab, floorParent, x, 0, z);
+				if (isWall || isPlayer || Random.value < 0.9) {
+          CreateChildPrefab(floorPrefab, floorParent, x, 0, z);
+        }
 
 				if (generateRoof) {
 					CreateChildPrefab(ceilingPrefab, wallsParent, x, 4, z);
