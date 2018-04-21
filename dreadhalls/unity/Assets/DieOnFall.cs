@@ -16,6 +16,7 @@ public class DieOnFall : MonoBehaviour {
       SceneManager.LoadScene("GameOver");
       Destroy(DontDestroy.instance.gameObject);
       DontDestroy.instance = null;
+      LevelManager.level = 0;
     }
 	}
 }
