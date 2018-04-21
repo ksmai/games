@@ -21,6 +21,8 @@ public class LevelGenerator : MonoBehaviour {
 
 	public int mazeSize;
 
+  public float holeProbability = 0.1f;
+
 	// spawns at the end of the maze generation
 	public GameObject pickup;
 
@@ -62,7 +64,7 @@ public class LevelGenerator : MonoBehaviour {
 				}
 
 				// create floor and ceiling
-				if (isWall || isPlayer || Random.value < 0.9) {
+				if (isWall || isPlayer || Random.value > holeProbability) {
           CreateChildPrefab(floorPrefab, floorParent, x, 0, z);
         }
 
