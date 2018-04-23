@@ -16,6 +16,17 @@ gFonts = {
   large = love.graphics.newFont('font/font.ttf', 16),
 }
 
+gTextures = {
+  aliens = love.graphics.newImage('textures/aliens.png'),
+  ships = love.graphics.newImage('textures/ships.png'),
+  particle = love.graphics.newImage('textures/particle.png'),
+}
+
+gFrames = {
+  aliens = generateQuads(gTextures['aliens'], 16, 16),
+  ships = generateQuads(gTextures['ships'], 16, 16),
+}
+
 gSounds = {
   explode = love.audio.newSource('sounds/explode.wav', 'static'),
   shoot = love.audio.newSource('sounds/shoot.wav', 'static'),
