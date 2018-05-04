@@ -3,12 +3,32 @@ Class = require 'lib/class'
 Timer = require 'lib/knife.timer'
 Event = require 'lib/knife.event'
 
+FILE_IDENTITY = 'spaceInvader'
+FILENAME = '.highscore'
+
 require 'src/Util'
+
+require 'src/BaseState'
+require 'src/StartState'
+require 'src/PlayState'
+require 'src/ScoreState'
+require 'src/StateMachine'
+
+require 'src/Alien'
+require 'src/AlienArmy'
+require 'src/Ship'
+require 'src/Bullet'
 
 VIRTUAL_WIDTH = 288
 VIRTUAL_HEIGHT = 216
 WINDOW_WIDTH = 1024
 WINDOW_HEIGHT = 768
+
+gStateMachine = StateMachine({
+  start = StartState,
+  play = PlayState,
+  score = ScoreState,
+})
 
 gFonts = {
   small = love.graphics.newFont('font/font.ttf', 8),
