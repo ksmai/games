@@ -9,6 +9,9 @@ function love.load()
     fullscreen = false,
   })
   love.keyboard.keysPressed = {}
+  gStateMachine:change('start')
+  gSounds['music']:setLooping(true)
+  gSounds['music']:play()
 end
 
 function love.keypressed(key)
@@ -29,11 +32,13 @@ end
 
 function love.update(dt)
   Timer.update(dt)
+  gStateMachine:update(dt)
   love.keyboard.keysPressed = {}
 end
 
 function love.draw()
   push:start()
+  gStateMachine:render()
   love.graphics.setFont(gFonts['small'])
   love.graphics.setColor(0, 255, 0, 255)
   love.graphics.printf(
